@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fake News Detection AI</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ========================= -->
+    <!-- SIDEBAR -->
+    <!-- ========================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <h2>FakeNews AI</h2>
+                <p>Naive Bayes Detector</p>
+            </div>
+
+        </div>
+
+        <ul class="menu">
+
+            <li class="active">
+                <a href="#dashboard">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#input">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>Machine Learning</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#result">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#history">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>History</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#footer">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>About</span>
+                </a>
+            </li>
+
+        </ul>
+
+        <!-- Model Card -->
+
+        <div class="model-card">
+
+            <h3>Model Status</h3>
+
+            <div class="status">
+
+                <span class="status-dot"></span>
+
+                Ready
+
+            </div>
+
+            <div class="model-info">
+
+                <p>
+                    <span>Algorithm</span>
+                    <strong>Naive Bayes</strong>
+                </p>
+
+                <p>
+                    <span>Dataset</span>
+                    <strong id="datasetCount">Loading...</strong>
+                </p>
+
+                <p>
+                    <span>Status</span>
+                    <strong>Active</strong>
+                </p>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- ========================= -->
+    <!-- MAIN -->
+    <!-- ========================= -->
+
+    <main class="main-content">
+
+        <!-- ========================= -->
+        <!-- NAVBAR -->
+        <!-- ========================= -->
+
+        <nav class="navbar">
+
+            <div>
+
+                <h1>
+                    Fake News Detection Dashboard
+                </h1>
+
+                <p>
+                    Analisis berita menggunakan
+                    <strong>Multinomial Naive Bayes</strong>
+                </p>
+
+            </div>
+
+            <div class="nav-right">
+
+                <div class="ai-badge">
+
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                    AI Powered
+
+                </div>
+
+            </div>
+
+        </nav>
+
+        <!-- ========================= -->
+        <!-- DASHBOARD CARDS -->
+        <!-- ========================= -->
+
+        <section id="dashboard" class="dashboard-cards">
+
+            <div class="stat-card">
+
+                <i class="fa-solid fa-newspaper"></i>
+
+                <div>
+
+                    <h2 id="totalDataset">
+
+                        0
+
+                    </h2>
+
+                    <p>Total Dataset</p>
+
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <i class="fa-solid fa-microchip"></i>
+
+                <div>
+
+                    <h2>
+
+                        Naive Bayes
+
+                    </h2>
+
+                    <p>Machine Learning</p>
+
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <i class="fa-solid fa-bolt"></i>
+
+                <div>
+
+                    <h2 id="predictSpeed">
+
+                        0 ms
+
+                    </h2>
+
+                    <p>Prediction Speed</p>
+
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <div>
+
+                    <h2 id="accuracy">
+
+                        --
+
+                    </h2>
+
+                    <p>Model Accuracy</p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================= -->
+        <!-- INPUT CARD -->
+        <!-- ========================= -->
+
+        <section id="input" class="input-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+
+                    Analisis Berita
+
+                </h2>
+
+                <p>
+
+                    Masukkan judul dan isi berita untuk dianalisis.
+
+                </p>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Judul Berita
+
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Masukkan judul berita..."
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Isi Berita
+
+                </label>
+
+                <textarea
+
+                    id="content"
+
+                    rows="12"
+
+                    placeholder="Tempel isi berita di sini..."
+
+                ></textarea>
+
+            </div>
+
+            <div class="button-group">
+
+                <button id="updateBtn" class="btn primary">
+
+                    <i class="fa-solid fa-rotate"></i>
+
+                    Update Dataset
+
+                </button>
+
+                <button id="trainBtn" class="btn warning">
+
+                    <i class="fa-solid fa-brain"></i>
+
+                    Retrain Model
+
+                </button>
+
+                <button id="predictBtn" class="btn success">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    Analisis
+
+                </button>
+
+            </div>
+
+        </section>
+
+                <!-- ========================= -->
+        <!-- HASIL ANALISIS -->
+        <!-- ========================= -->
+
+        <section id="result" class="result-section">
+
+            <div class="result-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-pie"></i>
+                        Hasil Analisis
+                    </h2>
+
+                    <span id="predictionBadge" class="badge waiting">
+                        Menunggu Analisis
+                    </span>
+
+                </div>
+
+                <div class="prediction-box">
+
+                    <div class="prediction-icon" id="predictionIcon">
+                        <i class="fa-solid fa-circle-question"></i>
+                    </div>
+
+                    <div>
+
+                        <h1 id="predictionText">
+                            -
+                        </h1>
+
+                        <p id="predictionDesc">
+                            Belum ada berita yang dianalisis.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- CONFIDENCE -->
+
+                <div class="confidence-section">
+
+                    <div class="progress-title">
+
+                        <span>Confidence</span>
+
+                        <span id="confidenceValue">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            id="confidenceBar"
+                            class="progress-fill confidence"
+                            style="width:0%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <!-- HOAX -->
+
+                <div class="confidence-section">
+
+                    <div class="progress-title">
+
+                        <span>
+                            Probabilitas Hoaks
+                        </span>
+
+                        <span id="hoaxValue">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            id="hoaxBar"
+                            class="progress-fill danger"
+                            style="width:0%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <!-- VALID -->
+
+                <div class="confidence-section">
+
+                    <div class="progress-title">
+
+                        <span>
+                            Probabilitas Valid
+                        </span>
+
+                        <span id="validValue">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            id="validBar"
+                            class="progress-fill success"
+                            style="width:0%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <!-- WAKTU -->
+
+                <div class="result-info">
+
+                    <div class="info-item">
+
+                        <i class="fa-solid fa-stopwatch"></i>
+
+                        <div>
+
+                            <span>Waktu Prediksi</span>
+
+                            <strong id="predictTime">
+
+                                -
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-item">
+
+                        <i class="fa-solid fa-brain"></i>
+
+                        <div>
+
+                            <span>Algoritma</span>
+
+                            <strong>
+
+                                Multinomial Naive Bayes
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================= -->
+            <!-- PROSES MACHINE LEARNING -->
+            <!-- ========================= -->
+
+            <div class="process-card">
+
+                <div class="card-header">
+
+                    <h2>
+
+                        <i class="fa-solid fa-gears"></i>
+
+                        Machine Learning Process
+
+                    </h2>
+
+                </div>
+
+                <div class="process-list">
+
+                    <div class="process-item">
+
+                        <span>Cleaning Text</span>
+
+                        <i id="step1"
+                           class="fa-regular fa-circle"></i>
+
+                    </div>
+
+                    <div class="process-item">
+
+                        <span>Case Folding</span>
+
+                        <i id="step2"
+                           class="fa-regular fa-circle"></i>
+
+                    </div>
+
+                    <div class="process-item">
+
+                        <span>Stopword Removal</span>
+
+                        <i id="step3"
+                           class="fa-regular fa-circle"></i>
+
+                    </div>
+
+                    <div class="process-item">
+
+                        <span>Stemming</span>
+
+                        <i id="step4"
+                           class="fa-regular fa-circle"></i>
+
+                    </div>
+
+                    <div class="process-item">
+
+                        <span>TF-IDF Vectorization</span>
+
+                        <i id="step5"
+                           class="fa-regular fa-circle"></i>
+
+                    </div>
+
+                    <div class="process-item">
+
+                        <span>Naive Bayes Classification</span>
+
+                        <i id="step6"
+                           class="fa-regular fa-circle"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================= -->
+        <!-- SCRAPING PROGRESS -->
+        <!-- ========================= -->
+
+        <section class="progress-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+
+                    Update Dataset
+
+                </h2>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    RSS ANTARA
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="rssProgress"
+                        class="progress-fill primary"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    GNews API
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="gnewsProgress"
+                        class="progress-fill primary"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    NewsData API
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="newsProgress"
+                        class="progress-fill primary"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    Merge Dataset
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="mergeProgress"
+                        class="progress-fill primary"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================= -->
+        <!-- TRAINING PROGRESS -->
+        <!-- ========================= -->
+
+        <section class="progress-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    <i class="fa-solid fa-microchip"></i>
+
+                    Training Progress
+
+                </h2>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    Load Dataset
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="train1"
+                        class="progress-fill warning"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    Preprocessing
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="train2"
+                        class="progress-fill warning"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    TF-IDF
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="train3"
+                        class="progress-fill warning"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    Naive Bayes
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="train4"
+                        class="progress-fill warning"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="progress-item">
+
+                <span>
+
+                    Save Model
+
+                </span>
+
+                <div class="progress">
+
+                    <div
+                        id="train5"
+                        class="progress-fill warning"
+                        style="width:0%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+                <!-- ========================= -->
+        <!-- HISTORY -->
+        <!-- ========================= -->
+
+        <section id="history" class="history-card">
+
+            <div class="card-header">
+
+                <h2>
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    Riwayat Analisis
+                </h2>
+
+                <button id="clearHistory" class="btn small danger">
+                    <i class="fa-solid fa-trash"></i>
+                    Hapus
+                </button>
+
+            </div>
+
+            <div class="history-table">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Waktu</th>
+
+                            <th>Judul</th>
+
+                            <th>Hasil</th>
+
+                            <th>Confidence</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="historyBody">
+
+                        <tr>
+
+                            <td colspan="4">
+
+                                Belum ada riwayat analisis.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- ========================= -->
+        <!-- LOADING OVERLAY -->
+        <!-- ========================= -->
+
+        <div id="loadingOverlay" class="loading-overlay">
+
+            <div class="loader-box">
+
+                <div class="loader-circle"></div>
+
+                <h2>
+
+                    AI Sedang Menganalisis...
+
+                </h2>
+
+                <p id="loadingText">
+
+                    Mohon tunggu sebentar.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- TOAST -->
+        <!-- ========================= -->
+
+        <div id="toast" class="toast">
+
+            <div class="toast-icon">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+            </div>
+
+            <div>
+
+                <h4 id="toastTitle">
+
+                    Berhasil
+
+                </h4>
+
+                <p id="toastMessage">
+
+                    Operasi berhasil.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- FOOTER -->
+        <!-- ========================= -->
+
+        <footer id="footer" class="footer">
+
+            <div>
+
+                <h3>
+
+                    Fake News Detection AI
+
+                </h3>
+
+                <p>
+
+                    Sistem klasifikasi berita hoaks menggunakan
+                    <strong>Multinomial Naive Bayes</strong>,
+                    TF-IDF dan preprocessing Bahasa Indonesia.
+
+                </p>
+
+            </div>
+
+            <div class="footer-right">
+
+                <div>
+
+                    <strong>Machine Learning</strong>
+
+                    <p>
+
+                        Multinomial Naive Bayes
+
+                    </p>
+
+                </div>
+
+                <div>
+
+                    <strong>Dataset</strong>
+
+                    <p>
+
+                        Kaggle + RSS + GNews + NewsData
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </footer>
+
+    </main>
+
+    <!-- ========================= -->
+    <!-- SCRIPT -->
+    <!-- ========================= -->
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
