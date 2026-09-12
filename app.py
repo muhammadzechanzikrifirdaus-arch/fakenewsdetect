@@ -10,6 +10,13 @@ import time
 app = Flask(__name__)
 
 # ==========================================================
+# DATASET
+# ==========================================================
+
+DATASET_URL = "https://etiifvbxqwjyty8l.private.blob.vercel-storage.com/dataset/final_dataset.csv?vercel-blob-valid-until=1789179094046&vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfZXRJaUZWYnhxV2pZVHk4TCIsIm93bmVySWQiOiJ0ZWFtX3F1c3ZwWWswWlpSbjZHc1JDeVdWdElzRyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg5MjIyMDg2Mjg2LCJpYXQiOjE3ODkxNzg4ODY3MDd9.sbE83m64zLQSW1yasIIlAQl7_8-sLsdT5ql2sENBrYc&vercel-blob-signature=iWalasMnU1ihZkIhTDmPpTeWS0TxZCReGc_4G0CXxdM"
+
+
+# ==========================================================
 # HOME
 # ==========================================================
 
@@ -29,17 +36,13 @@ def predict():
     if not os.path.exists("model/model.pkl"):
 
         return jsonify({
-
             "success": False,
-
             "message": "Model belum tersedia. Silakan lakukan training terlebih dahulu."
-
         })
 
     data = request.get_json()
 
     title = data.get("title", "")
-
     content = data.get("content", "")
 
     text = (title + " " + content).strip()
@@ -47,11 +50,8 @@ def predict():
     if len(text) == 0:
 
         return jsonify({
-
             "success": False,
-
             "message": "Masukkan judul atau isi berita."
-
         })
 
     start = time.time()
@@ -84,15 +84,44 @@ def predict():
 @app.route("/status")
 def status():
 
-    return jsonify({
+    try:
 
-        "status": "running",
+        dataset_exist = False
 
-        "model_exist": os.path.exists("model/model.pkl"),
+        try:
+            pd.read_csv(
+                DATASET_URL,
+                nrows=1
+            )
 
-        "dataset_exist": os.path.exists("dataset/final_dataset.csv")
+            dataset_exist = True
 
-    })
+        except Exception:
+            dataset_exist = False
+
+        return jsonify({
+
+            "status": "running",
+
+            "model_exist": os.path.exists("model/model.pkl"),
+
+            "dataset_exist": dataset_exist
+
+        })
+
+    except Exception as e:
+
+        return jsonify({
+
+            "status": "running",
+
+            "model_exist": os.path.exists("model/model.pkl"),
+
+            "dataset_exist": False,
+
+            "error": str(e)
+
+        })
 
 
 # ==========================================================
@@ -138,7 +167,31 @@ def model_info():
 @app.route("/dataset-info")
 def dataset_info():
 
-    if not os.path.exists("dataset/final_dataset.csv"):
+    try:
+
+        df = pd.read_csv(DATASET_URL)
+
+        total = len(df)
+
+        valid = int(
+            (df["label"] == 1).sum()
+        )
+
+        hoax = int(
+            (df["label"] == 0).sum()
+        )
+
+        return jsonify({
+
+            "total": total,
+
+            "valid": valid,
+
+            "hoax": hoax
+
+        })
+
+    except Exception as e:
 
         return jsonify({
 
@@ -146,39 +199,12 @@ def dataset_info():
 
             "valid": 0,
 
-            "hoax": 0
+            "hoax": 0,
+
+            "error": str(e)
 
         })
 
-    df = pd.read_csv(
-
-        "dataset/final_dataset.csv"
-
-    )
-
-    total = len(df)
-
-    valid = int(
-
-        (df["label"] == 1).sum()
-
-    )
-
-    hoax = int(
-
-        (df["label"] == 0).sum()
-
-    )
-
-    return jsonify({
-
-        "total": total,
-
-        "valid": valid,
-
-        "hoax": hoax
-
-    })
 
 # ==========================================================
 # UPDATE DATASET (SCRAPING)
@@ -328,9 +354,7 @@ def retrain():
 def check_model():
 
     exist = os.path.exists(
-
         "model/model.pkl"
-
     )
 
     size = 0
@@ -361,31 +385,33 @@ def check_model():
 @app.route("/check-dataset")
 def check_dataset():
 
-    exist = os.path.exists(
-
-        "dataset/final_dataset.csv"
-
-    )
-
-    total = 0
-
-    if exist:
+    try:
 
         df = pd.read_csv(
-
-            "dataset/final_dataset.csv"
-
+            DATASET_URL
         )
 
         total = len(df)
 
-    return jsonify({
+        return jsonify({
 
-        "exist": exist,
+            "exist": True,
 
-        "total": total
+            "total": total
 
-    })
+        })
+
+    except Exception as e:
+
+        return jsonify({
+
+            "exist": False,
+
+            "total": 0,
+
+            "error": str(e)
+
+        })
 
 
 # ==========================================================
@@ -402,9 +428,7 @@ def health():
         "server": "Running",
 
         "time": time.strftime(
-
             "%Y-%m-%d %H:%M:%S"
-
         )
 
     })
